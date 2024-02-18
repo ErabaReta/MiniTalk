@@ -1,48 +1,70 @@
 #include "minitalk.h"
-#include <string.h>
-#include <stdio.h>
+
+int	ft_atoi(char *str)
+{
+	int	i;
+	int	nbr;
+	int	sign;
+
+	i = 0;
+	sign = 1;
+	while (str[i] == 32 || (str[i] >= 9 && str[i] <= 13))
+		i++;
+	if (str[i] == '+' || str[i] == '-')
+	{
+		if (str[i] == '-')
+			sign *= -1;
+		i++;
+	}
+	nbr = 0;
+	while (str[i] != '\0' && (str[i] >= '0' && str[i] <= '9'))
+	{
+		nbr *= 10;
+		nbr += str[i++] - 48;
+	}
+	return (nbr * sign);
+}
+
+void sig_handler(int sig)
+{
+	if (sig == SIGUSR1)
+	{
+		write(1, "Message recieved.", 17);
+	}
+}
+
 int main(int ac, char **av)
 {
 	pid_t	pid;
-	int		len;
 	int		i;
-	char	*str;
 
-	if (ac != 3)
-	{
+	if (ac != 3 || av[2][0] == '\0')
 		return (1);
-	printf("ERROR not enough pars.\n");//////////////
-
-	}
-	pid = atoi(av[1]);///////////////
-	printf("server's PID: %d\n", pid);//////////////
-	len = strlen(av[2]);/////////////
-	if (len == 0)
-		return (1);
-	str = strdup(av[2]);/////////////
-	printf("string to send: %s\n", str);//////////////
+	signal(SIGUSR1, &sig_handler);
+	pid = ft_atoi(av[1]);
 	i = 0;
 	int j = 0;
-	while (i < len)
+	while (av[2][i] != 0)
 	{
 		j = 7;
 		while(j >= 0)
 		{
-			if ((str[i] >> j & 1) == 0)
-			{
-				kill(pid, SIGUSR1);// BIT 0
-				printf("SIGUSR1 sent\n");
-			}
+			if ((av[2][i] >> j & 1) == 0)
+				kill(pid, SIGUSR1);
 			else
-			{
-				kill(pid, SIGUSR2);// BIT 1
-				printf("SIGUSR2 sent\n");
-			}
+				kill(pid, SIGUSR2);
 			j--;
-			usleep(400);
+			usleep(100);
 		}
 		i++;
 	}
-	
+	j = 0;
+	while (j < 8)
+	{
+		kill(pid, SIGUSR1);
+		j++;
+		usleep(100);
+	}
+	sleep(1);
 	return (0);
 }

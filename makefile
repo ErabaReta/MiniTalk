@@ -1,24 +1,35 @@
 CC = cc
 RM = rm -rf
 CFLAGS = -Wall -Wextra -Werror
-CFILES = 
-OFILES = $(CFILES:.c=.o)
-NAME = 
+CCFILES = client.c
+SCFILES = server.c
+COFILES = $(CCFILES:.c=.o)
+SOFILES = $(SCFILES:.c=.o)
+CNAME = client
+SNAME = server
+NAME = $(SNAME) $(CNAME)
 
 all : $(NAME)
 
-$(NAME) : $(OFILES)
-	$(CC) $(OFILES) -o $(NAME)
+$(CNAME) : $(COFILES)
+	$(CC) $(CFLAGS) $(COFILES) -o $(CNAME)
 
-# $(OFILES) : $(CFILES)
-# 	$(CC) -c $(CFILES)
+$(SNAME) : $(SOFILES)
+	$(CC) $(SFLAGS) $(SOFILES) -o $(SNAME)
 
-.c.o:
-	$(CC) -c $< -o $@
+$(COFILES) : $(CCFILES)
+	$(CC) -c $(CFLAGS) $(CCFILES)
+
+$(SOFILES) : $(SCFILES)
+	$(CC) -c $(CFLAGS) $(SCFILES)
+
+#.c.o:
+#	$(CC) -c $< -o $@
 # $(CC) $(CFLAGS) -c $< -o $@
+bonus : all
 
 clean :
-	$(RM) $(OFILES) $(BONUS_OFILES)
+	$(RM) $(COFILES) $(SOFILES)
 
 fclean : clean
 	$(RM) $(NAME)
