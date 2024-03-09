@@ -1,12 +1,24 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   server.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: eouhrich <eouhrich@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/03/09 20:29:28 by eouhrich          #+#    #+#             */
+/*   Updated: 2024/03/09 20:29:29 by eouhrich         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minitalk.h"
 
-void ft_putchar(char c)
+void	ft_putchar(char c)
 {
 	write(1, &c, 1);
 }
 
 void	ft_putnbr(long nbr)
-{	
+{
 	if (nbr < 0)
 	{
 		ft_putchar('-');
@@ -21,10 +33,10 @@ void	ft_putnbr(long nbr)
 		ft_putchar(nbr + 48);
 }
 
-void signal_handler(int sig, siginfo_t *info, void *context)
+void	signal_handler(int sig, siginfo_t *info, void *context)
 {
-	static char c;
-	static char counter;
+	static char	c;
+	static char	counter;
 
 	(void)context;
 	if (sig == SIGUSR1)
@@ -32,7 +44,7 @@ void signal_handler(int sig, siginfo_t *info, void *context)
 	else if (sig == SIGUSR2)
 		c = c | 1;
 	counter++;
-	if(counter == 8)
+	if (counter == 8)
 	{
 		counter = 0;
 		if (c == 0)
@@ -47,22 +59,23 @@ void signal_handler(int sig, siginfo_t *info, void *context)
 	}
 }
 
-int main()
+int	main(void)
 {
-	pid_t pid;
-	struct sigaction sigact;
+	pid_t				pid;
+	struct sigaction	sigact;
 
 	sigact.sa_sigaction = signal_handler;
 	sigact.sa_flags = SA_SIGINFO;
-	if (sigaction(SIGUSR1, &sigact, NULL) != 0 || sigaction(SIGUSR2, &sigact, NULL) != 0)
+	if (sigaction(SIGUSR1, &sigact, NULL) != 0
+		|| sigaction(SIGUSR2, &sigact, NULL) != 0)
 		return (1);
 	pid = getpid();
 	write(1, "PID: ", 5);
 	ft_putnbr((long)pid);
 	write(1, "\n", 1);
-	while(1)
+	while (1)
 	{
 		sleep(1);
 	}
-	return(0);
+	return (0);
 }

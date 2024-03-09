@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   client.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: eouhrich <eouhrich@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/03/09 20:29:36 by eouhrich          #+#    #+#             */
+/*   Updated: 2024/03/09 20:40:32 by eouhrich         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minitalk.h"
 
 int	ft_atoi(char *str)
@@ -25,7 +37,7 @@ int	ft_atoi(char *str)
 	return (nbr * sign);
 }
 
-void sig_handler(int sig)
+void	sig_handler(int sig)
 {
 	if (sig == SIGUSR1)
 	{
@@ -33,38 +45,44 @@ void sig_handler(int sig)
 	}
 }
 
-int main(int ac, char **av)
+void	bits_sender(pid_t pid, char **av)
 {
-	pid_t	pid;
 	int		i;
+	int		j;
 
-	if (ac != 3 || av[2][0] == '\0')
-		return (1);
-	signal(SIGUSR1, &sig_handler);
-	pid = ft_atoi(av[1]);
 	i = 0;
-	int j = 0;
-	while (av[2][i] != 0)
+	j = 0;
+	while (av[2][i] != '\0')
 	{
 		j = 7;
-		while(j >= 0)
+		while (j >= 0)
 		{
 			if ((av[2][i] >> j & 1) == 0)
 				kill(pid, SIGUSR1);
 			else
 				kill(pid, SIGUSR2);
 			j--;
-			usleep(100);
+			usleep(250);
 		}
 		i++;
 	}
-	j = 0;
-	while (j < 8)
+	j = -1;
+	while (++j < 8)
 	{
 		kill(pid, SIGUSR1);
-		j++;
-		usleep(100);
+		usleep(300);
 	}
+}
+
+int	main(int ac, char **av)
+{
+	pid_t	pid;
+
+	if (ac != 3 || av[2][0] == '\0')
+		return (1);
+	signal(SIGUSR1, &sig_handler);
+	pid = ft_atoi(av[1]);
+	bits_sender(pid, av);
 	sleep(1);
 	return (0);
 }
