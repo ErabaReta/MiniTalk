@@ -6,42 +6,21 @@
 /*   By: eouhrich <eouhrich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/09 20:29:36 by eouhrich          #+#    #+#             */
-/*   Updated: 2024/03/09 20:40:32 by eouhrich         ###   ########.fr       */
+/*   Updated: 2024/03/25 20:41:41 by eouhrich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-int	ft_atoi(char *str)
-{
-	int	i;
-	int	nbr;
-	int	sign;
+pid_t	g_pid;
 
-	i = 0;
-	sign = 1;
-	while (str[i] == 32 || (str[i] >= 9 && str[i] <= 13))
-		i++;
-	if (str[i] == '+' || str[i] == '-')
-	{
-		if (str[i] == '-')
-			sign *= -1;
-		i++;
-	}
-	nbr = 0;
-	while (str[i] != '\0' && (str[i] >= '0' && str[i] <= '9'))
-	{
-		nbr *= 10;
-		nbr += str[i++] - 48;
-	}
-	return (nbr * sign);
-}
-
-void	sig_handler(int sig)
+void	signal_handler(int sig, siginfo_t *info, void *context)
 {
-	if (sig == SIGUSR1)
+	(void)context;
+	if (sig == SIGUSR1 && info->si_pid == g_pid)
 	{
-		write(1, "Message recieved.", 17);
+		write(1, "Message recieved.\n", 18);
+		exit(0);
 	}
 }
 
@@ -49,6 +28,7 @@ void	bits_sender(pid_t pid, char **av)
 {
 	int		i;
 	int		j;
+	int		returned;
 
 	i = 0;
 	j = 0;
@@ -58,31 +38,40 @@ void	bits_sender(pid_t pid, char **av)
 		while (j >= 0)
 		{
 			if ((av[2][i] >> j & 1) == 0)
-				kill(pid, SIGUSR1);
+				returned = kill(pid, SIGUSR1);
 			else
-				kill(pid, SIGUSR2);
+				returned = kill(pid, SIGUSR2);
 			j--;
-			usleep(250);
+			if (returned == -1)
+				exit(1);
+			usleep(300);
 		}
 		i++;
-	}
-	j = -1;
-	while (++j < 8)
-	{
-		kill(pid, SIGUSR1);
-		usleep(300);
 	}
 }
 
 int	main(int ac, char **av)
 {
-	pid_t	pid;
+	struct sigaction	sigact;
+	int					i;
 
-	if (ac != 3 || av[2][0] == '\0')
+	sigact.sa_sigaction = signal_handler;
+	sigact.sa_flags = SA_SIGINFO;
+	sigemptyset(&sigact.sa_mask);
+	if (sigaction(SIGUSR1, &sigact, NULL) != 0
+		|| sigaction(SIGUSR2, &sigact, NULL) != 0 || ac != 3)
 		return (1);
-	signal(SIGUSR1, &sig_handler);
-	pid = ft_atoi(av[1]);
-	bits_sender(pid, av);
+	g_pid = ft_minitalk_atoi(av[1]);
+	if (g_pid <= 1)
+		return (1);
+	bits_sender(g_pid, av);
+	i = 0;
+	while (i < 8)
+	{
+		kill(g_pid, SIGUSR1);
+		usleep(300);
+		i++;
+	}
 	sleep(1);
 	return (0);
 }

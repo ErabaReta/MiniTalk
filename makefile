@@ -1,7 +1,7 @@
 CC = cc
 RM = rm -rf
 CFLAGS = -Wall -Wextra -Werror
-CCFILES = client.c
+CCFILES = client.c ft_minitalk_atoi.c
 SCFILES = server.c
 COFILES = $(CCFILES:.c=.o)
 SOFILES = $(SCFILES:.c=.o)
@@ -12,10 +12,10 @@ NAME = $(SNAME) $(CNAME)
 all : $(NAME)
 
 $(CNAME) : $(COFILES)
-	$(CC) $(CFLAGS) $(COFILES) -o $(CNAME)
+	$(CC) $(CFLAGS) $(COFILES) -fsanitize=address -o $(CNAME)
 
 $(SNAME) : $(SOFILES)
-	$(CC) $(SFLAGS) $(SOFILES) -o $(SNAME)
+	$(CC) $(SFLAGS) $(SOFILES) -fsanitize=address -o $(SNAME)
 
 $(COFILES) : $(CCFILES)
 	$(CC) -c $(CFLAGS) $(CCFILES)
@@ -23,9 +23,6 @@ $(COFILES) : $(CCFILES)
 $(SOFILES) : $(SCFILES)
 	$(CC) -c $(CFLAGS) $(SCFILES)
 
-#.c.o:
-#	$(CC) -c $< -o $@
-# $(CC) $(CFLAGS) -c $< -o $@
 bonus : all
 
 clean :

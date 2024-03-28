@@ -6,7 +6,7 @@
 /*   By: eouhrich <eouhrich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/09 20:29:28 by eouhrich          #+#    #+#             */
-/*   Updated: 2024/03/09 20:29:29 by eouhrich         ###   ########.fr       */
+/*   Updated: 2024/03/25 20:40:42 by eouhrich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,10 @@ void	signal_handler(int sig, siginfo_t *info, void *context)
 	{
 		counter = 0;
 		if (c == 0)
+		{
+			write(1, "\n", 1);
 			kill(info->si_pid, SIGUSR1);
+		}
 		else
 			write(1, &c, 1);
 		c = 0;
@@ -66,6 +69,7 @@ int	main(void)
 
 	sigact.sa_sigaction = signal_handler;
 	sigact.sa_flags = SA_SIGINFO;
+	sigemptyset(&sigact.sa_mask);
 	if (sigaction(SIGUSR1, &sigact, NULL) != 0
 		|| sigaction(SIGUSR2, &sigact, NULL) != 0)
 		return (1);
