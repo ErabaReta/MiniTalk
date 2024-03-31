@@ -1,7 +1,0 @@
-{
-	"files.associations": {
-		"signal.h": "c",
-		"stdio.h": "c",
-		"minitalk.h": "c"
-	}
-}
