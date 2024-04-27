@@ -23,7 +23,7 @@ so the client iterate the message and send bit by bit (chars varible are stored 
 the same for the server who catch the signals one by one so it prints tha character every 8 bit, but look carefully, signals don't actually take a data with them like you cant store a data in a signal then send, we just agree to take a signal to present that binary unit for example, in my project i toke the SIGUSR1 as the bit 0 and toke the SIGUSR2 as bit 1.
 
 ## using makefile:
-to compile all the medatory functions into object files then archive them to a clinet and server program use the command:
+to compile all the medatory functions into object files then compile them into a client and server programs use the command:
 
     make
 
