@@ -29,9 +29,9 @@ to compile all the medatory functions into object files then compile them into a
 
 or you can use:
 
-    make client;
-    make server
+    make client  ; make server
 or:
+
     make all
 
 for the bonus part use:
